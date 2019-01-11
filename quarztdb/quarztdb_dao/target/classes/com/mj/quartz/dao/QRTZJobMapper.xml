@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.mj.quartz.dao.QRTZJobMapper">
+  <resultMap id="BaseResultMap" type="com.mj.quartz.model.QRTZJob">
+    <id column="Id" jdbcType="BIGINT" property="id" />
+    <result column="JobName" jdbcType="NVARCHAR" property="jobName" />
+    <result column="JobGroup" jdbcType="NVARCHAR" property="jobGroup" />
+    <result column="JobStatus" jdbcType="INTEGER" property="jobStatus" />
+    <result column="CronExpression" jdbcType="VARCHAR" property="cronExpression" />
+    <result column="Desc" jdbcType="NVARCHAR" property="desc" />
+    <result column="ClassPath" jdbcType="VARCHAR" property="classPath" />
+    <result column="MethodName" jdbcType="VARCHAR" property="methodName" />
+    <result column="CreateTime" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="UpdateTime" jdbcType="TIMESTAMP" property="updateTime" />
+  </resultMap>
+  
+  <sql id="Base_Column_List">
+    Id, JobName, JobGroup, JobStatus, CronExpression, [Desc], ClassPath, MethodName, CreateTime, 
+    UpdateTime
+  </sql>
+  
+  <select id="selectJobs" resultType="com.mj.quartz.model.QRTZJob">
+     select job.Id,job.JobName,job.JobGroup,job.MethodName,job.ClassPath,job.SCHED_NAME as SchedName,
+		simtri.CRON_EXPRESSION as cronExpression,tri.TRIGGER_STATE as jobStatus
+		from [dbo].[QRTZ_Job] job
+		left join [dbo].[QRTZ_JOB_DETAILS] jd
+		on jd.SCHED_NAME=job.SCHED_NAME and jd.JOB_NAME=job.JobName and jd.JOB_GROUP=job.JobGroup
+		left join [dbo].[QRTZ_TRIGGERS] tri
+		on tri.JOB_NAME=job.JobName and tri.JOB_GROUP=job.JobGroup
+		left join [dbo].[QRTZ_CRON_TRIGGERS] simtri
+		on simtri.SCHED_NAME=tri.SCHED_NAME and simtri.TRIGGER_GROUP=tri.TRIGGER_GROUP and simtri.TRIGGER_NAME=tri.TRIGGER_NAME
+  </select>
+  
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from QRTZ_Job
+    where Id = #{id,jdbcType=BIGINT}
+  </select>
+  
+  <insert id="insert" parameterType="com.mj.quartz.model.QRTZJob">
+    insert into QRTZ_Job (JobName, JobGroup, 
+      JobStatus, CronExpression, [Desc], 
+      ClassPath, MethodName, CreateTime, 
+      UpdateTime)
+    values (#{jobName,jdbcType=NVARCHAR}, #{jobGroup,jdbcType=NVARCHAR}, 
+      #{jobStatus,jdbcType=INTEGER}, #{cronExpression,jdbcType=VARCHAR}, #{desc,jdbcType=NVARCHAR}, 
+      #{classPath,jdbcType=VARCHAR}, #{methodName,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP}, 
+      #{updateTime,jdbcType=TIMESTAMP})
+  </insert>
+  
+  <update id="updateByPrimaryKey" parameterType="com.mj.quartz.model.QRTZJob">
+    update QRTZ_Job
+    set JobName = #{jobName,jdbcType=NVARCHAR},
+      JobGroup = #{jobGroup,jdbcType=NVARCHAR},
+      JobStatus = #{jobStatus,jdbcType=INTEGER},
+      CronExpression = #{cronExpression,jdbcType=VARCHAR},
+      Desc = #{desc,jdbcType=NVARCHAR},
+      ClassPath = #{classPath,jdbcType=VARCHAR},
+      MethodName = #{methodName,jdbcType=VARCHAR},
+      CreateTime = #{createTime,jdbcType=TIMESTAMP},
+      UpdateTime = #{updateTime,jdbcType=TIMESTAMP}
+    where Id = #{id,jdbcType=BIGINT}
+  </update>
+</mapper>

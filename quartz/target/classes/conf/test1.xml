@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:cache="http://www.springframework.org/schema/cache"
+	xmlns:c="http://www.springframework.org/schema/c" xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans
+       http://www.springframework.org/schema/beans/spring-beans.xsd
+       http://www.springframework.org/schema/cache
+       http://www.springframework.org/schema/cache/spring-cache.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd">
+
+
+	<bean id="exampleJob2" class="pluginone.Test"></bean>
+	<bean id="exampleJob2Detail"
+		class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+		<!-- 指定任务类 -->
+		<property name="targetObject" ref="exampleJob2" />
+		<!-- 指定任务执行的方法 -->
+		<property name="targetMethod" value="main" />
+	</bean>
+	<bean id="exampleJob2Trigger"
+		class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail" ref="exampleJob2Detail" />
+		<!-- 每10秒运行一次 -->
+		<property name="cronExpression" value="0/10 * * * * ?" />
+	</bean>
+
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<!-- <ref bean="exampleJobTrigger" /> -->
+				<ref bean="exampleJob2Trigger" />
+			</list>
+		</property>
+	</bean>
+</beans>

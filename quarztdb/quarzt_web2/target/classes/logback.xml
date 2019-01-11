@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+	<property name="LOG_DIR" value="/logs/jarvis-service" />
+
+	<!-- 控制台(标准)输出.开发环境需要,其他环境不设置标准输出 -->
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{80} -
+				%msg%n</pattern>
+			<charset>UTF-8</charset>
+		</encoder>
+	</appender>
+
+	<!-- 文件输出 -->
+	<appender name="FILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_DIR}/application.log</file>
+		<!-- 按天来滚动，如果需要按小时来滚动，则设置为{yyyy-MM-dd_HH} -->
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_DIR}/application.log.%d{yyyy-MM-dd}.zip
+			</fileNamePattern>
+			<!-- 最大保存的历史文件数量 -->
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<!-- 日志输出格式 -->
+			<pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{80} -
+				%msg%n</pattern>
+			<!-- 设置编码 -->
+			<charset>UTF-8</charset>
+		</encoder>
+	</appender>
+
+	<!-- 异步输出 -->
+	<appender name="ASYNC_FILE" class="ch.qos.logback.classic.AsyncAppender">
+		<!--丢弃阈值 ,默认-1 -->
+		<discardingThreshold>-1</discardingThreshold>
+		<!-- 更改默认的队列的深度,该值会影响性能.默认值为256 -->
+		<queueSize>512</queueSize>
+		<!-- 添加附加的appender,最多只能添加一个 -->
+		<appender-ref ref="FILE" />
+	</appender>
+
+	<!-- 文件输出 -->
+	<appender name="STDOUTFILE"
+		class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${LOG_DIR}/application-stdout.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${LOG_DIR}/application-stdout.%d{yyyy-MM-dd}.zip
+			</fileNamePattern>
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+		<encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+			<pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{80} -
+				%msg%n</pattern>
+			<charset>UTF-8</charset>
+		</encoder>
+	</appender>
+	<appender name="ASYNC_STDOUTFILE" class="ch.qos.logback.classic.AsyncAppender">
+		<discardingThreshold>0</discardingThreshold>
+		<queueSize>512</queueSize>
+		<appender-ref ref="STDOUTFILE" />
+	</appender>
+
+
+	<!-- - 1.name ：包名或类名，用来指定受此logger约束的某一个包或者具体的某一个类 - 2.leve l：设置打印级别（TRACE, 
+		DEBUG, INFO, WARN, ERROR, ALL 和 OFF），未设置打印级别，那么当前logger将会继承上级的级别。 - 3.addtivity 
+		: 默认为true，将此logger的打印信息向上级传递,会打印两次；为false，表示此logger的打印信息不再向上级传递 - 4.appender-ref：此logger本身不打印任何信息，级别为“DEBUG”及大于“DEBUG”的日志信息传递给root， -->
+
+
+	<logger name="org.springframework.transaction">
+		<level value="DEBUG" />
+	</logger>
+
+	<logger name="org.springframework.dao">
+		<level value="DEBUG" />
+	</logger>
+
+	<logger name="org.apache.http">
+		<level value="INFO" />
+	</logger>
+
+	<logger name="org.springframework.data">
+		<level value="INFO" />
+	</logger>
+
+	<logger name="org.springframework.web.client">
+		<level value="INFO" />
+	</logger>
+
+	<logger name="io.lettuce.core.protocol">
+		<level value="WARN" />
+	</logger>
+
+	<!--生产环境禁止打印debug日志,防止磁盘出现问题 -->
+	<logger name="ROOT">
+		<level value="DEBUG" />
+		<appender-ref ref="STDOUT" />
+		<appender-ref ref="FILE" />
+	</logger>
+</configuration>
